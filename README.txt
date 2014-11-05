@@ -3,7 +3,7 @@ Contributors: jarkkolaine
 Tags: license management,licence,license,updates
 Requires at least: 3.0
 Tested up to: 4.0
-Stable tag: 0.5.0
+Stable tag: 0.5.1
 License: GPLv3 or later.
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -45,7 +45,7 @@ To make the integration as easy as possible, we have created a PHP class that yo
 to your theme or plugin to make it query updates from your own license server instead of WordPress.org.
 
 The class and detailed integration instructions can be found on GitHub:
-[http://github.com/jarkkolaine/wp-license-manager-client]:"WP License Manager Client"
+[WP License Manager Client](http://github.com/jarkkolaine/wp-license-manager-client)
 
 
 == Frequently Asked Questions ==

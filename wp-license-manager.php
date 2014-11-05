@@ -16,7 +16,7 @@
  * Plugin Name:       WP License Manager
  * Plugin URI:        http://fourbean.com/wp-license-manager/
  * Description:       Turn your WordPress site into a license manager for WordPress plugins, themes, and other downloadable products.
- * Version:           1.0.0
+ * Version:           0.5.1
  * Author:            Fourbean
  * Author URI:        http://fourbean.com/
  * License:           GPL-3.0+
