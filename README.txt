@@ -45,7 +45,7 @@ To make the integration as easy as possible, we have created a PHP class that yo
 to your theme or plugin to make it query updates from your own license server instead of WordPress.org.
 
 The class and detailed integration instructions can be found on GitHub:
-[http://github.com/jarkkolaine/wp-license-manager-client]:"WP License Manager Client"
+[WP License Manager Client](http://github.com/jarkkolaine/wp-license-manager-client)
 
 
 == Frequently Asked Questions ==
