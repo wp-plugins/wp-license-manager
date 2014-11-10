@@ -1,7 +1,5 @@
 <?php
 
-use Aws\S3\S3Client;
-
 /**
  * The API handler for handling API requests from themes and plugins using
  * the license manager.
@@ -151,26 +149,14 @@ class License_Manager_API {
      */
     private function get_product( $product ) {
         // Get the AWS data from post meta fields
-        $bucket = get_post_meta( $product->ID, '_product_file_bucket', true);
-        $file_name = get_post_meta( $product->ID, '_product_file_name', true);
+        $bucket = get_post_meta( $product->ID, '_product_file_bucket', true );
+        $file_name = get_post_meta( $product->ID, '_product_file_name', true );
 
         // Use the AWS API to set up the download
-        require_once plugin_dir_path( dirname( __FILE__ ) ) .'lib/aws/aws-autoloader.php';
-
-        // Instantiate the S3 client with stored AWS credentials
-        $options = get_option( 'wp-license-manager-settings' );
-        $s3_client = S3Client::factory(
-            array(
-                'key'    => $options['aws_key'],
-                'secret' => $options['aws_secret']
-            )
-        );
-
-        $s3_url = $s3_client->getObjectUrl($bucket, $file_name, '+10 minutes');
-
         // This API method is called directly by WordPress so we need to adhere to its
         // requirements and skip the JSON. WordPress expects to receive a ZIP file...
 
+        $s3_url = Wp_License_Manager_S3::get_s3_url( $bucket, $file_name );
         wp_redirect( $s3_url, 302 );
     }
 
@@ -237,7 +223,7 @@ class License_Manager_API {
      * @return array    The error response as an array that can be passed to send_response.
      */
     private function error_response( $msg ) {
-        return array( "error" => $msg );
+        return array( 'error' => $msg );
     }
 
     /**

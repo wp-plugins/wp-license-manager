@@ -157,6 +157,12 @@ class Wp_License_Manager_Public {
      */
     public function add_api_endpoint_rules() {
         add_rewrite_rule('^api/license-manager/?([0-9a-zA-Z]+)?/?','index.php?__wp_license_api=$matches[1]','top');
+
+        // If this was the first time, flush rules
+        if ( get_option( 'wp-license-manager-rewrite-rules-version' ) != '1.0' ) {
+            flush_rewrite_rules();
+            update_option( 'wp-license-manager-rewrite-rules-version', '1.0' );
+        }
     }
 
     /**

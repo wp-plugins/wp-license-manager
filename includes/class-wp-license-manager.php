@@ -56,7 +56,7 @@ class Wp_License_Manager {
 	public function __construct() {
 
 		$this->plugin_name = 'wp-license-manager';
-		$this->version = '1.0.0';
+		$this->version = '0.5.2';
 
 		$this->load_dependencies();
 		$this->set_locale();
@@ -115,6 +115,11 @@ class Wp_License_Manager {
          * The class responsible for handling the incoming license manager API calls.
          */
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-license-manager-api.php';
+
+        /**
+         * A wrapper class for our Amazon S3 connectivity.
+         */
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-wp-license-manager-s3.php';
 
         $this->loader = new Wp_License_Manager_Loader();
 
