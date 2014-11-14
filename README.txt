@@ -1,7 +1,7 @@
 === WP License Manager ===
 Contributors: jarkkolaine
 Tags: license management,licence,license,updates
-Requires at least: 3.0
+Requires at least: 3.1
 Tested up to: 4.0
 Stable tag: 0.5.2
 License: GPLv3 or later.
@@ -13,7 +13,7 @@ Turn your WordPress site into a software license manager for WordPress plugins, 
 
 WP License Manager is an easy to use plugin that will turn your WordPress site into a license manager that can be used for WordPress themes, plugins and other downloadable products.
 
-Downloadable files are stored in the Amazon cloud (S3) to keep them safe from people without a license.
+Downloadable files are stored in Amazon Simple Storage Service (S3) to keep them safe from people without a license.
 
 Possible uses for WP License Manager:
 
@@ -61,6 +61,9 @@ FAQ coming soon.
 
 
 == Changelog ==
+
+= 0.5.3 =
+* Changed the name of the products custom post type to prevent conflicts with other plugins.
 
 = 0.5.2 =
 * Added support for PHP versions < 5.3. We highly recommend upgrading to PHP 5.3+ but understand that not all users have the possibility to do so.

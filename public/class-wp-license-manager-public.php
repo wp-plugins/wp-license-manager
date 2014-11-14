@@ -12,7 +12,6 @@ class Wp_License_Manager_Public {
 	/**
 	 * The ID of this plugin.
 	 *
-	 * @since    1.0.0
 	 * @access   private
 	 * @var      string    $plugin_name    The ID of this plugin.
 	 */
@@ -21,7 +20,6 @@ class Wp_License_Manager_Public {
 	/**
 	 * The version of this plugin.
 	 *
-	 * @since    1.0.0
 	 * @access   private
 	 * @var      string    $version    The current version of this plugin.
 	 */
@@ -35,7 +33,6 @@ class Wp_License_Manager_Public {
 	/**
 	 * Initialize the class and set its properties.
 	 *
-	 * @since    1.0.0
 	 * @var      string    $plugin_name       The name of the plugin.
 	 * @var      string    $version    The version of this plugin.
 	 */
@@ -50,59 +47,24 @@ class Wp_License_Manager_Public {
 
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Plugin_Name_Public_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Plugin_Name_Public_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wp-license-manager-public.css', array(), $this->version, 'all' );
-
 	}
 
 	/**
 	 * Register the stylesheets for the public-facing side of the site.
-	 *
-	 * @since    1.0.0
 	 */
 	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Plugin_Name_Public_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Plugin_Name_Public_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-license-manager-public.js', array( 'jquery' ), $this->version, false );
-
 	}
 
     /**
-     * Register the new "products" post type to use for products that are available for purchase
-     * through the license manager.
-     *
-     * @since   1.0.0
+     * Register the new "products" post type to use for products that
+     * are available for purchase through the license manager.
      */
     public function add_products_post_type() {
-
-        register_post_type( 'product',
+        register_post_type( 'wplm_product',
             array(
                 'labels' => array(
                     'name' => __( 'Products', $this->plugin_name ),
@@ -121,10 +83,9 @@ class Wp_License_Manager_Public {
                 ),
                 'public' => true,
                 'has_archive' => true,
-                'supports' => array( 'title', 'editor', 'author', 'custom-fields', 'revisions', 'thumbnail' ),
+                'supports' => array( 'title', 'editor', 'author', 'revisions', 'thumbnail' ),
                 'rewrite' => array( 'slug' => 'products' ),
                 'menu_icon' => 'dashicons-products',
-                'menu_position' => 25,
             )
         );
     }
@@ -136,7 +97,6 @@ class Wp_License_Manager_Public {
     /**
      * Defines the query variables used by the API.
      *
-     * @since 1.0.0
      * @param $vars     array   Existing query variables from WordPress.
      * @return array    The $vars array appended with our new variables
      */
@@ -152,11 +112,10 @@ class Wp_License_Manager_Public {
 
     /**
      * The permalink structure definition for API calls.
-     *
-     * @since 1.0.0
      */
     public function add_api_endpoint_rules() {
-        add_rewrite_rule('^api/license-manager/?([0-9a-zA-Z]+)?/?','index.php?__wp_license_api=$matches[1]','top');
+        add_rewrite_rule( '^api/license-manager/?([0-9a-zA-Z]+)?/?',
+            'index.php?__wp_license_api=$matches[1]', 'top' );
 
         // If this was the first time, flush rules
         if ( get_option( 'wp-license-manager-rewrite-rules-version' ) != '1.0' ) {
@@ -167,8 +126,6 @@ class Wp_License_Manager_Public {
 
     /**
      * A sniffer function that looks for API calls and passes them to our API handler.
-     *
-     * @since 1.0.0
      */
     public function sniff_api_requests() {
         global $wp;

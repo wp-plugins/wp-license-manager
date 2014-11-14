@@ -6,8 +6,6 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the dashboard-specific stylesheet and JavaScript.
  *
- * @since 1.0.0
- *
  * @package    Wp_License_Manager
  * @subpackage Wp_License_Manager/admin
  * @author     Jarkko Laine <jarkko@jarkkolaine.com>
@@ -17,7 +15,6 @@ class Wp_License_Manager_Admin {
 	/**
 	 * The ID of this plugin.
 	 *
-     * @since 1.0.0
 	 * @access   private
 	 * @var      string    $plugin_name    The ID of this plugin.
 	 */
@@ -26,7 +23,6 @@ class Wp_License_Manager_Admin {
 	/**
 	 * The version of this plugin.
 	 *
-     * @since 1.0.0
 	 * @access   private
 	 * @var      string    $version    The current version of this plugin.
 	 */
@@ -35,7 +31,6 @@ class Wp_License_Manager_Admin {
 	/**
 	 * Initialize the class and set its properties.
 	 *
-     * @since 1.0.0
 	 * @var      string    $plugin_name       The name of this plugin.
 	 * @var      string    $version    The version of this plugin.
 	 */
@@ -46,8 +41,6 @@ class Wp_License_Manager_Admin {
 
 	/**
 	 * Register the stylesheets for the Dashboard.
-     *
-     * @since 1.0.0
 	 */
 	public function enqueue_styles() {
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/wp-license-manager-admin.css', array(), $this->version, 'all' );
@@ -55,8 +48,6 @@ class Wp_License_Manager_Admin {
 
 	/**
 	 * Register the JavaScript for the dashboard.
-     *
-     * @since 1.0.0
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/wp-license-manager-admin.js', array( 'jquery' ), $this->version, false );
@@ -66,7 +57,6 @@ class Wp_License_Manager_Admin {
      * Registers a meta box for entering product information. The meta box is
      * shown in the post editor for the "product" post type.
      *
-     * @since 1.0.0
      * @param   $post   WP_Post The post object to apply the meta box to
      */
     public function add_product_information_meta_box( $post ) {
@@ -74,45 +64,44 @@ class Wp_License_Manager_Admin {
             'product-information-meta-box',
             __( 'Product Information', $this->plugin_name ),
             array ( $this, 'render_product_information_meta_box' ),
-            'product',
-            'side',
-            'default'
+            'wplm_product',
+            'side'
         );
     }
 
     /**
-     * Renders the product information meta box for the given post (product).
+     * Renders the product information meta box for the given post (wplm_product).
      *
-     * @since 1.0.0
      * @param $post     WP_Post     The WordPress post object being rendered.
      */
     public function render_product_information_meta_box( $post ) {
-        wp_nonce_field( $this->plugin_name . '_product_meta_box', $this->plugin_name . '_product_meta_box_nonce' );
+        $product_meta = get_post_meta( $post->ID, 'wp_license_manager_product_meta', true );
 
-        // The data for the meta box fields (rendered in the partial)
-        $bucket = get_post_meta( $post->ID, '_product_file_bucket', true );
-        $file_name = get_post_meta( $post->ID, '_product_file_name', true );
-        $version = get_post_meta( $post->ID, '_product_version', true );
-        $tested = get_post_meta( $post->ID, '_product_tested', true );
-        $requires = get_post_meta( $post->ID, '_product_requires', true );
-        $last_updated = get_post_meta( $post->ID, '_product_updated', true );
+        if ( ! is_array( $product_meta ) ) {
+            $product_meta = array(
+                'bucket' => '',
+                'file_name' => '',
+                'version' => '',
+                'tested' => '',
+                'requires' => '',
+                'updated' => '',
+                'banner_low' => '',
+                'banner_high' => ''
+            );
+        }
 
-        $banner_low = get_post_meta( $post->ID, '_product_banner_low', true );
-        $banner_high = get_post_meta( $post->ID, '_product_banner_high', true );
+        $this->render_nonce_field( 'product_meta_box' );
 
-        // Display the form
         require( 'partials/product_meta_box.php' );
     }
 
     /**
      * Saves the product information meta box contents.
      *
-     * @since 1.0.0
      * @param $post_id  int     The id of the post being saved.
      */
     public function save_product_information_meta_box( $post_id ) {
-        // Check nonce
-        if ( !$this->is_nonce_ok() ) {
+        if ( ! $this->is_nonce_ok( 'product_meta_box' ) ) {
             return $post_id;
         }
 
@@ -126,40 +115,48 @@ class Wp_License_Manager_Admin {
             return $post_id;
         }
 
-        // Sanitize user input
-        $bucket = sanitize_text_field( $_POST['wp_license_manager_product_bucket'] );
-        $file_name = sanitize_text_field( $_POST['wp_license_manager_product_file_name'] );
-        $version = sanitize_text_field( $_POST['wp_license_manager_product_version'] );
+        // Read, sanitize, and store user input
+        $meta = get_post_meta( $post_id, 'wp_license_manager_product_meta', true );
+        if ( $meta == '' ) {
+            $meta = array();
+        }
 
-        $tested = sanitize_text_field( $_POST['wp_license_manager_product_tested'] );
-        $requires = sanitize_text_field( $_POST['wp_license_manager_product_requires'] );
-        $last_updated = sanitize_text_field( $_POST['wp_license_manager_product_updated'] );
-
-        $banner_low = sanitize_text_field( $_POST['wp_license_manager_product_banner_low'] );
-        $banner_high = sanitize_text_field( $_POST['wp_license_manager_product_banner_high'] );
+        $meta['file_bucket'] = sanitize_text_field( $_POST['wp_license_manager_product_bucket'] );
+        $meta['file_name'] = sanitize_text_field( $_POST['wp_license_manager_product_file_name'] );
+        $meta['version'] = sanitize_text_field( $_POST['wp_license_manager_product_version'] );
+        $meta['tested'] = sanitize_text_field( $_POST['wp_license_manager_product_tested'] );
+        $meta['requires'] = sanitize_text_field( $_POST['wp_license_manager_product_requires'] );
+        $meta['updated'] = sanitize_text_field( $_POST['wp_license_manager_product_updated'] );
+        $meta['banner_low'] = sanitize_text_field( $_POST['wp_license_manager_product_banner_low'] );
+        $meta['banner_high'] = sanitize_text_field( $_POST['wp_license_manager_product_banner_high'] );
 
         // Update the meta field
-        update_post_meta( $post_id, '_product_file_bucket', $bucket );
-        update_post_meta( $post_id, '_product_file_name', $file_name );
-        update_post_meta( $post_id, '_product_version', $version );
-        update_post_meta( $post_id, '_product_tested', $tested );
-        update_post_meta( $post_id, '_product_requires', $requires );
-        update_post_meta( $post_id, '_product_updated', $last_updated );
-        update_post_meta( $post_id, '_product_banner_low', $banner_low );
-        update_post_meta( $post_id, '_product_banner_high', $banner_high );
+        update_post_meta( $post_id, 'wp_license_manager_product_meta', $meta );
+    }
+
+    /**
+     * A helper function for creating and rendering a nonce field.
+     *
+     * @param   $nonce_label  string  An internal (shorter) nonce name
+     */
+    private function render_nonce_field( $nonce_label ) {
+        $nonce_field_name = $this->plugin_name . '_' . $nonce_label . '_nonce';
+        $nonce_name = $this->plugin_name . '_' . $nonce_label;
+
+        wp_nonce_field( $nonce_name, $nonce_field_name );
     }
 
     /**
      * A helper function for checking the product meta box nonce.
      *
-     * @since 1.0.0
-     * @return mixed False if nonce is not OK. 1 or 2 if nonce is OK (@see wp_verify_nonce)
+     * @param   $nonce_label string  An internal (shorter) nonce name
+     * @return  mixed   False if nonce is not OK. 1 or 2 if nonce is OK (@see wp_verify_nonce)
      */
-    private function is_nonce_ok() {
-        $nonce_field_name = $this->plugin_name . '_product_meta_box_nonce';
-        $nonce_name = $this->plugin_name . '_product_meta_box';
+    private function is_nonce_ok( $nonce_label ) {
+        $nonce_field_name = $this->plugin_name . '_' . $nonce_label . '_nonce';
+        $nonce_name = $this->plugin_name . '_' . $nonce_label;
 
-        if ( !isset( $_POST[ $nonce_field_name ] ) ) {
+        if ( ! isset( $_POST[ $nonce_field_name ] ) ) {
             return false;
         }
 
@@ -170,8 +167,6 @@ class Wp_License_Manager_Admin {
 
     /**
      * Creates the settings menu and sub menus for adding and listing licenses.
-     *
-     * @since 1.0.0
      */
     public function add_licenses_menu_page() {
         add_menu_page(
@@ -179,20 +174,20 @@ class Wp_License_Manager_Admin {
             __( 'Licenses', $this->plugin_name ),
             'edit_posts',
             'wp-licenses',
-            array( $this, 'do_licenses_menu_list' ),
+            array( $this, 'render_licenses_menu_list' ),
             'dashicons-lock',
-            27 // position
+            '26.1'
         );
 
-        add_submenu_page('wp-licenses',
+        add_submenu_page(
+            'wp-licenses',
             __( 'Licenses', $this->plugin_name ),
             __( 'Licenses', $this->plugin_name ),
             'edit_posts',
             'wp-licenses',
-            array( $this, 'do_licenses_menu_list' )
+            array( $this, 'render_licenses_menu_list' )
         );
 
-        // add new will be described in next part
         add_submenu_page(
             'wp-licenses',
             __( 'Add new', $this->plugin_name ),
@@ -205,10 +200,8 @@ class Wp_License_Manager_Admin {
 
     /**
      * Renders the list of licenses menu page using the "licenses_list.php" partial.
-     *
-     * @since 1.0.0
      */
-    public function do_licenses_menu_list() {
+    public function render_licenses_menu_list() {
         global $wpdb;
 
         $license_deleted = false;
@@ -235,9 +228,8 @@ class Wp_License_Manager_Admin {
     }
 
     /**
-     * Renders the list add new license menu page using the "licenses_new.php" partial.
-     *
-     * @since 1.0.0
+     * Renders the list add new license menu page using
+     * the "licenses_new.php" partial.
      */
     public function render_licenses_menu_new() {
         // Used in the "Product" drop-down list in view
@@ -245,7 +237,7 @@ class Wp_License_Manager_Admin {
             array(
                 'orderby' 		   => 'post_title',
                 'order'            => 'ASC',
-                'post_type'        => 'product',
+                'post_type'        => 'wplm_product',
                 'post_status'      => 'publish',
                 'nopaging'         => true,
                 'suppress_filters' => true
@@ -255,17 +247,16 @@ class Wp_License_Manager_Admin {
         require plugin_dir_path( dirname( __FILE__ ) ) . 'admin/partials/licenses_new.php';
     }
 
-
     /**
-     * Handler for the add_license action (submitting the "Add License" form).
-     *
-     * @since 1.0.0
+     * Handler for the add_license action (submitting
+     * the "Add New License" form).
      */
     public function handle_add_license() {
         global $wpdb;
 
         if ( ! empty( $_POST )
-            && check_admin_referer( 'wp-license-manager-add-license', 'wp-license-manager-add-license-nonce' ) ) {
+            && check_admin_referer( 'wp-license-manager-add-license',
+                'wp-license-manager-add-license-nonce' ) ) {
 
             // Nonce valid, handle data
 
@@ -305,8 +296,6 @@ class Wp_License_Manager_Admin {
     /**
      * Adds a link to the plugin settings page (see below) from the plugins page.
      *
-     * @since 1.0.0
-     *
      * @param $links    array   A list of existing links
      * @return array            Links with the new item added to it.
      */
@@ -320,8 +309,6 @@ class Wp_License_Manager_Admin {
 
     /**
      * Adds an options page for plugin settings.
-     *
-     * @since 1.0.0
      */
     public function add_plugin_settings_page() {
         add_options_page(
@@ -335,8 +322,6 @@ class Wp_License_Manager_Admin {
 
     /**
      * Creates the settings fields for the plugin options page.
-     *
-     * @since 1.0.0
      */
     public function add_plugin_settings_fields() {
         $settings_group_id = 'wp-license-manager-settings-group';
@@ -371,8 +356,6 @@ class Wp_License_Manager_Admin {
 
     /**
      * Renders the plugin's options page.
-     *
-     * @since 1.0.0
      */
     public function render_settings_page() {
         $settings_group_id = 'wp-license-manager-settings-group';
@@ -381,8 +364,6 @@ class Wp_License_Manager_Admin {
 
     /**
      * Renders the description for the AWS settings section.
-     *
-     * @since 1.0.0
      */
     public function render_aws_settings_section() {
         // We use a partial here to make it easier to add more complex instructions
@@ -391,8 +372,6 @@ class Wp_License_Manager_Admin {
 
     /**
      * Renders the settings field for the AWS key.
-     *
-     * @since 1.0.0
      */
     public function render_aws_key_settings_field() {
         $settings_field_id = 'wp-license-manager-settings';
@@ -404,8 +383,6 @@ class Wp_License_Manager_Admin {
 
     /**
      * Renders the settings field for the AWS secret.
-     *
-     * @since 1.0.0
      */
     public function render_aws_secret_settings_field() {
         $settings_field_id = 'wp-license-manager-settings';
@@ -417,8 +394,6 @@ class Wp_License_Manager_Admin {
 
     /**
      * If the plugin hasn't been configured properly, display a notice.
-     *
-     * @since 1.0.0
      */
     public function show_admin_notices() {
         $options = get_option('wp-license-manager-settings');

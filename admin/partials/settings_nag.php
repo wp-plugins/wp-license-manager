@@ -2,8 +2,6 @@
 /**
  * The view for the plugin's settings nag..
  *
- * @since      1.0.0
- *
  * @package    Wp_License_Manager
  * @subpackage Wp_License_Manager/admin/partials
  */

@@ -6,23 +6,21 @@
  * @package     Wp_License_Manager
  * @subpackage  Wp_License_Manager/admin
  *
- * @since       1.0.0
- *
  * @author      Jarkko Laine <jarkko@jarkkolaine.com>
  */
-class Licenses_List_Table extends Wp_List_Table {
+class Licenses_List_Table extends Wp_License_Manager_List_Table {
 
     /**
-     * @since   1.0.0
+     * The plugin's text domain.
+     *
      * @access  private
      * @var     string  The plugin's text domain. Used for localization.
      */
     private $text_domain;
 
     /**
-     * Initializes the List_Table implementation.
+     * Initializes the WP_List_Table implementation.
      *
-     * @since 1.0.0
      * @param $text_domain  string  The text domain used for localizing the plugin.
      */
     public function __construct( $text_domain ) {
@@ -32,9 +30,10 @@ class Licenses_List_Table extends Wp_List_Table {
     }
 
     /**
-     * Returns the database columns used in the table.
+     * Defines the database columns shown in the table and a
+     * header for each column. The order of the columns in the
+     * table define the order in which they are rendered in the list table.
      *
-     * @since 1.0.0
      * @return array    The database columns and their headers for the table.
      */
     public function get_columns() {
@@ -48,7 +47,8 @@ class Licenses_List_Table extends Wp_List_Table {
     }
 
     /**
-     * @since 1.0.0
+     * Returns the names of columns that should be hidden from the list table.
+     *
      * @return array    The database columns that should not be shown in the table.
      */
     public function get_hidden_columns() {
@@ -56,7 +56,8 @@ class Licenses_List_Table extends Wp_List_Table {
     }
 
     /**
-     * @since 1.0.0
+     * Returns the columns that can be used for sorting the list table data.
+     *
      * @return array    The database columns that can be used for sorting the table.
      */
     public function get_sortable_columns() {
@@ -69,7 +70,6 @@ class Licenses_List_Table extends Wp_List_Table {
     /**
      * Custom renderer for the product_id field.
      *
-     * @since 1.0.0
      * @param $item     array   The database row being printed out.
      * @return string   The text or HTML that should be shown for the column.
      */
@@ -88,7 +88,6 @@ class Licenses_List_Table extends Wp_List_Table {
     /**
      * Custom renderer for the valid_until field.
      *
-     * @since 1.0.0
      * @param $item     array   The database row being printed out.
      * @return string   The text or HTML that should be shown for the column.
      */
@@ -105,7 +104,6 @@ class Licenses_List_Table extends Wp_List_Table {
     /**
      * Custom renderer for the license_key field.
      *
-     * @since 1.0.0
      * @param $item     array   The database row being printed out.
      * @return string   The text or HTML that should be shown for the column.
      */
@@ -129,10 +127,9 @@ class Licenses_List_Table extends Wp_List_Table {
     /**
      * Default rendering for table columns.
      *
-     * @since 1.0.0
-     * @param $item             array   The database row being printed out.
-     * @param $column_name      string  The column currently processed.
-     * @return string           The text or HTML that should be shown for the column.
+     * @param $item         array   The database row being printed out.
+     * @param $column_name  string  The column currently processed.
+     * @return string       The text or HTML that should be shown for the column.
      */
     function column_default( $item, $column_name ) {
         switch( $column_name ) {
@@ -148,9 +145,7 @@ class Licenses_List_Table extends Wp_List_Table {
     }
 
     /**
-     * Populates the class fields related to displaying the licenses.
-     *
-     * @since 1.0.0
+     * Populates the class fields for displaying the list of licenses.
      */
     public function prepare_items() {
         global $wpdb;

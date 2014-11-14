@@ -4,7 +4,6 @@
  * The API handler for handling API requests from themes and plugins using
  * the license manager.
  *
- * @since      1.0.0
  * @package    Wp_License_Manager
  * @subpackage Wp_License_Manager/public
  * @author     Jarkko Laine <jarkko@jarkkolaine.com>
@@ -15,7 +14,6 @@ class License_Manager_API {
      * The handler function that receives the API calls and passes them on to the
      * proper handlers.
      *
-     * @since 1.0.0
      * @param $action   string  The name of the action
      * @param $params   array   Request parameters
      */
@@ -40,7 +38,6 @@ class License_Manager_API {
     /**
      * Returns a list of variables used by the API
      *
-     * @since   1.0.0
      * @return  array    An array of query variable names.
      */
     public function get_api_vars() {
@@ -72,7 +69,7 @@ class License_Manager_API {
         $posts = get_posts(
             array (
                 'name' => $product_id,
-                'post_type' => 'product',
+                'post_type' => 'wplm_product',
                 'post_status' => 'publish',
                 'numberposts' => 1
             )
@@ -109,7 +106,6 @@ class License_Manager_API {
      * The handler for the "info" request. Checks the user's license information and
      * returns information about the product (latest version, name, update url).
      *
-     * @since   1.0.0
      * @param   $product_id     string    The product id (slug)
      * @param   $product        WP_Post   The product object
      * @param   $email          string    The email address associated with the license
@@ -119,12 +115,14 @@ class License_Manager_API {
      */
     private function product_info( $product_id, $product, $email, $license_key ) {
         // Collect all the metadata we have and return it to the caller
-        $version = get_post_meta( $product->ID, '_product_version', true );
-        $tested = get_post_meta( $product->ID, '_product_tested', true );
-        $last_updated = get_post_meta( $product->ID, '_product_updated', true );
-        $author = get_post_meta( $product->ID, '_product_author', true );
-        $banner_low = get_post_meta( $product->ID, '_product_banner_low', true );
-        $banner_high = get_post_meta( $product->ID, '_product_banner_high', true );
+        $meta = get_post_meta( $product->ID, 'wp_license_manager_product_meta' );
+
+        $version = isset ( $meta['version'] ) ? $meta['version'] : '';
+        $tested = isset ( $meta['tested'] ) ? $meta['tested'] : '';
+        $last_updated = isset ( $meta['updated'] ) ? $meta['updated'] : '';
+        $author = isset ( $meta['author'] ) ? $meta['author'] : ''; // TODO not in the meta box currently...
+        $banner_low = isset ( $meta['banner_low'] ) ? $meta['banner_low'] : '';
+        $banner_high = isset ( $meta['banner_high'] ) ? $meta['banner_high'] : '';
 
         return array(
             'name' => $product->post_title,
@@ -144,13 +142,13 @@ class License_Manager_API {
      * The handler for the "get" request. Checks the user's license information and
      * redirects to a file download if all is OK.
      *
-     * @since   1.0.0
      * @param   $product    WP_Post     The product object
      */
     private function get_product( $product ) {
         // Get the AWS data from post meta fields
-        $bucket = get_post_meta( $product->ID, '_product_file_bucket', true );
-        $file_name = get_post_meta( $product->ID, '_product_file_name', true );
+        $meta = get_post_meta( $product->ID, 'wp_license_manager_product_meta' );
+        $bucket = isset ( $meta['file_bucket'] ) ? $meta['file_bucket'] : '';
+        $file_name = isset ( $meta['file_bucket'] ) ? $meta['file_bucket'] : '';
 
         // Use the AWS API to set up the download
         // This API method is called directly by WordPress so we need to adhere to its
@@ -166,8 +164,6 @@ class License_Manager_API {
 
     /**
      * Looks up a license that matches the given parameters.
-     *
-     * @since 1.0.0
      *
      * @param $product_id   int     The numeric ID of the product.
      * @param $email        string  The email address attached to the license.
@@ -192,8 +188,6 @@ class License_Manager_API {
     /**
      * Checks whether a license with the given parameters exists and is still valid.
      *
-     * @since 1.0.0
-     *
      * @param $product_id   int     The numeric ID of the product.
      * @param $email        string  The email address attached to the license.
      * @param $license_key  string  The license key.
@@ -217,8 +211,6 @@ class License_Manager_API {
      * Generates and returns a simple error response. Used to make sure every error
      * message uses same formatting.
      *
-     * @since 1.0.0
-     *
      * @param $msg      string  The message to be included in the error response.
      * @return array    The error response as an array that can be passed to send_response.
      */
@@ -229,12 +221,10 @@ class License_Manager_API {
     /**
      * Prints out the JSON response for an API call.
      *
-     * @since 1.0.0
-     *
      * @param $response array   The response as associative array.
      */
     private function send_response( $response ) {
-        echo json_encode($response) . '\n';
+        echo json_encode( $response ) . '\n';
     }
 
 }

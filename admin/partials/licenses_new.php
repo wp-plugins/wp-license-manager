@@ -2,13 +2,10 @@
 /**
  * The view for the admin page used for adding a new license.
  *
- * @since      1.0.0
- *
  * @package    Wp_License_Manager
  * @subpackage Wp_License_Manager/admin/partials
  */
 ?>
-
 <div class="wrap">
     <div id="icon-edit" class="icon32 icon32-posts-post"></div>
 
@@ -16,7 +13,7 @@
     <p>
         <?php
             $instructions = 'Use this form to manually add a product license. '
-                          . 'After completing the process, make sure to pass the license key to the customer.';
+                . 'After completing the process, make sure to pass the license key to the customer.';
 
             _e( $instructions, $this->plugin_name );
         ?>

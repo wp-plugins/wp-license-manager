@@ -8,8 +8,7 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              http://example.com
- * @since             1.0.0
+ * @link              http://fourbean.com/wp-license-manager/
  * @package           Wp_License_Manager
  *
  * @wordpress-plugin
@@ -76,8 +75,6 @@ if ( !function_exists( 'write_log' ) ) {
  * Since everything within the plugin is registered via hooks,
  * then kicking off the plugin from this point in the file does
  * not affect the page life cycle.
- *
- * @since    1.0.0
  */
 function run_wp_license_manager() {
 

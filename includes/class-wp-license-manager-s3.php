@@ -14,7 +14,6 @@ if ( version_compare( PHP_VERSION, '5.3.0') >= 0 ) {
  * Depending on the PHP version available, we use either the official AWS
  * API or a custom one.
  *
- * @since      1.0.0
  * @package    Wp_License_Manager
  * @subpackage Wp_License_Manager/includes
  * @author     Jarkko Laine <jarkko@jarkkolaine.com>
