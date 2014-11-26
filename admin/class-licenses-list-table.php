@@ -121,7 +121,7 @@ class Licenses_List_Table extends Wp_License_Manager_List_Table {
 
         $title = '<code>' . $item['license_key'] . '</code>';
 
-        return sprintf('%1$s %2$s', $title, $this->row_actions($actions) );
+        return sprintf( '%1$s %2$s', $title, $this->row_actions( $actions ) );
     }
 
     /**

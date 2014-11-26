@@ -1,5 +1,4 @@
 <?php
-use Aws\S3\S3Client;
 require_once plugin_dir_path( dirname( __FILE__ ) ) .'lib/aws/aws-autoloader.php';
 
 /**
@@ -23,7 +22,7 @@ class Wp_License_Manager_S3_Official {
      * @return string       The signed download URL
      */
     public static function get_s3_url( $key, $secret, $bucket, $file_name ) {
-        $s3_client = S3Client::factory(
+        $s3_client = Aws\S3\S3Client::factory(
             array(
                 'key'    => $key,
                 'secret' => $secret
