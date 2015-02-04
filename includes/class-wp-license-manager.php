@@ -50,13 +50,15 @@ class Wp_License_Manager {
 	public function __construct() {
 
 		$this->plugin_name = 'wp-license-manager';
-		$this->version = '0.5.4';
+		$this->version = '0.5.5';
 
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 
+		// Initialize the data updater
+		$this->loader->add_action( 'init', $this, 'update_plugin_data' );
 	}
 
 	/**
@@ -221,6 +223,80 @@ class Wp_License_Manager {
 	 */
 	public function get_version() {
 		return $this->version;
+	}
+
+	/**
+	 * Runs at plugin init. Checks the plugin's version and does updates
+	 * as needed.
+	 */
+	public function update_plugin_data() {
+
+		// Get the stored plugin version. If the version is not set, this is a clean installation.
+		// If the version differs from current version, the plugin has been updated and we'll
+		// run an update if necessary.
+		$plugin_version = get_option( $this->plugin_name . '_plugin-version', false );
+
+		if ( $plugin_version == $this->version ) {
+			// Already at current version
+			return false;
+		} else {
+			// The plugin was just updated. Update the version right away to prevent concurrency issues
+			// with more than one thread running the updates at once.
+
+			update_option( $this->plugin_name . '_plugin-version', $this->version );
+
+			if ( $plugin_version === false ) {
+				// This is a clean installation, no need to run updates.
+
+				/*
+				 * Exception: Because we added this update functionality only at version 0.5.5 of the plugin,
+				 * we need to make an exception for people running that version.
+				 *
+				 * This is hacky and will lead to some people running the update unnecessarily, but since
+				 * there are still only a small number of installs so far, it's better than not doing it.
+				 */
+				if ( $this->version == '0.5.5' ) {
+					$plugin_version = '0.5.4';
+				} else {
+					return false;
+				}
+			}
+
+			// Do the updates based on previous version
+
+			if ( version_compare( $plugin_version, '0.5.5' ) < 0 ) {
+
+				// Update product meta box and post type id for old products created before
+				// the update.
+
+				$posts = get_posts(
+					array(
+						'posts_per_page' => -1,
+						'post_type' => 'product'
+					)
+				);
+
+				foreach ( $posts as $post ) {
+					if ( get_post_meta($post->ID, 'wp_license_manager_product_meta', true) == '' ) {
+						$meta = array();
+						$meta['file_bucket'] = get_post_meta($post->ID, '_product_file_bucket', true);
+						$meta['file_name'] = get_post_meta($post->ID, '_product_file_name', true);
+						$meta['version'] = get_post_meta($post->ID, '_product_version', true);
+						$meta['tested'] = get_post_meta($post->ID, '_product_tested', true);
+						$meta['requires'] = get_post_meta($post->ID, '_product_requires', true);
+						$meta['updated'] = get_post_meta($post->ID, '_product_updated', true);
+						$meta['banner_low'] = get_post_meta($post->ID, '_product_banner_low', true);
+						$meta['banner_high'] = get_post_meta($post->ID, '_product_banner_high', true);
+
+						update_post_meta( $post->ID, 'wp_license_manager_product_meta', $meta );
+					}
+
+					// Update post type to a better name
+					set_post_type( $post->ID, 'wplm_product' );
+				}
+
+			}
+		}
 	}
 
 }

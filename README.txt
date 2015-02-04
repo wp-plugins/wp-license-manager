@@ -3,7 +3,7 @@ Contributors: jarkkolaine
 Tags: license management,licence,license,updates
 Requires at least: 3.1
 Tested up to: 4.1
-Stable tag: 0.5.4
+Stable tag: 0.5.5
 License: GPLv3 or later.
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -61,6 +61,9 @@ FAQ coming soon.
 
 
 == Changelog ==
+
+= 0.5.5 =
+* Added a new plugin data update system. Fixes the problem with products disappearing after the 0.5.4 update.
 
 = 0.5.4 =
 * Changed the name of the products custom post type to prevent conflicts with other plugins.

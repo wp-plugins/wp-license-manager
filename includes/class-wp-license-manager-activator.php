@@ -20,68 +20,19 @@ class Wp_License_Manager_Activator {
     protected static $db_version = 1;
 
     /**
-     * The version number for the product post type data. This was needed because we gave the post type
-     * a bad name at first (easily colliding with other plugins). This should never go higher than 1.
+     * Code that is run at plugin activation. Notice: This code does NOT run when plugin
+     * is updated automatically (or via version control updates)
      *
-     * @access   protected
-     * @var      string    $products_version   The version of the products post type
-     */
-    protected static $products_version = 1;
-
-    /**
-     * Code that is run at plugin activation.
-     *
-     * Creates or updates the database structure required by the plugin and does other
-     * data initialization
+     * Creates the initial database structure required by the plugin and does other
+     * data initialization. For updates, @see Wp_License_Manager->update_plugin_data().
 	 */
 	public static function activate() {
         // Get some version numbers
-        $current_products_version = get_option( 'wp-license-manager-products-version' );
-        if ( ! $current_products_version ) {
-            $current_products_version = 0;
-        }
-        $current_products_version = intval( $current_products_version );
-
         $current_db_version = get_option( 'wp-license-manager-db-version' );
         if ( ! $current_db_version ) {
             $current_db_version = 0;
         }
         $current_db_version = intval( $current_db_version );
-
-        // If the user has created products using an old meta box structure, update data
-        if ( $current_products_version < Wp_License_Manager_Activator::$products_version ) {
-            // If this is a clean installation (DB version still 0, don't do anything.
-            // The user cannot have added products and therefore any product type posts are
-            // from other plugins...
-            if ( $current_db_version > 0 ) {
-                $posts = get_posts(
-                    array(
-                        'posts_per_page' => -1,
-                        'post_type' => 'product'
-                    )
-                );
-                foreach ($posts as $post) {
-                    if (get_post_meta($post->ID, 'wp_license_manager_product_meta', true) == '') {
-                        $meta = array();
-                        $meta['file_bucket'] = get_post_meta($post->ID, '_product_file_bucket', true);
-                        $meta['file_name'] = get_post_meta($post->ID, '_product_file_name', true);
-                        $meta['version'] = get_post_meta($post->ID, '_product_version', true);
-                        $meta['tested'] = get_post_meta($post->ID, '_product_tested', true);
-                        $meta['requires'] = get_post_meta($post->ID, '_product_requires', true);
-                        $meta['updated'] = get_post_meta($post->ID, '_product_updated', true);
-                        $meta['banner_low'] = get_post_meta($post->ID, '_product_banner_low', true);
-                        $meta['banner_high'] = get_post_meta($post->ID, '_product_banner_high', true);
-
-                        update_post_meta($post->ID, 'wp_license_manager_product_meta', $meta);
-                    }
-
-                    // Update post type to a better name
-                    set_post_type($post->ID, 'wplm_product');
-                }
-            }
-
-            update_option( 'wp-license-manager-products-version', Wp_License_Manager_Activator::$products_version );
-        }
 
         // Update database if db version has increased
         if ( intval( $current_db_version ) < Wp_License_Manager_Activator::$db_version ) {
