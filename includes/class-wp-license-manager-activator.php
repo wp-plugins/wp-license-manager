@@ -36,6 +36,11 @@ class Wp_License_Manager_Activator {
 
         // Update database if db version has increased
         if ( intval( $current_db_version ) < Wp_License_Manager_Activator::$db_version ) {
+            // Hack for new installs at 0.5.5 so that we don't break anyone's existing product
+            // post types from other plugins / themes
+            // TODO: make sure to remove this at next update!
+            update_option( 'wp-license-manager_plugin-version', '0.5.5' );
+
             if ( Wp_License_Manager_Activator::create_or_upgrade_db() ) {
                 update_option( 'wp-license-manager-db-version', Wp_License_Manager_Activator::$db_version );
             }
