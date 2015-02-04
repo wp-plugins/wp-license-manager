@@ -146,6 +146,7 @@ class Wp_License_Manager_API {
 
         $s3_url = Wp_License_Manager_S3::get_s3_url( $bucket, $file_name );
         wp_redirect( $s3_url, 302 );
+        exit;
     }
 
     //

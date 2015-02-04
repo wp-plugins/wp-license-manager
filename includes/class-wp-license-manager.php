@@ -50,7 +50,7 @@ class Wp_License_Manager {
 	public function __construct() {
 
 		$this->plugin_name = 'wp-license-manager';
-		$this->version = '0.5.2';
+		$this->version = '0.5.3';
 
 		$this->load_dependencies();
 		$this->set_locale();

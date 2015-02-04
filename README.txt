@@ -2,8 +2,8 @@
 Contributors: jarkkolaine
 Tags: license management,licence,license,updates
 Requires at least: 3.1
-Tested up to: 4.0
-Stable tag: 0.5.2
+Tested up to: 4.1
+Stable tag: 0.5.3
 License: GPLv3 or later.
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -64,6 +64,7 @@ FAQ coming soon.
 
 = 0.5.3 =
 * Changed the name of the products custom post type to prevent conflicts with other plugins.
+* Fixed conflicts with other menu items.
 
 = 0.5.2 =
 * Added support for PHP versions < 5.3. We highly recommend upgrading to PHP 5.3+ but understand that not all users have the possibility to do so.
