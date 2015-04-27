@@ -2,7 +2,7 @@
 Contributors: jarkkolaine
 Tags: license management,licence,license,updates
 Requires at least: 3.1
-Tested up to: 4.1
+Tested up to: 4.2
 Stable tag: 0.5.5
 License: GPLv3 or later.
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
